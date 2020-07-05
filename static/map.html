@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GalMap - Leaflet</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+    <script type="text/javascript" src="/methods.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #060606;
+        }
+
+        .leaflet-container {
+            background: #060606;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mapid" style="height: 900px;"></div>
+    <script type="text/javascript">
+        async function createMap() {
+            var bounds = [[-24000, -50000], [76000, 50000]];
+            window.map = L.map('mapid', { crs: L.CRS.Simple, minZoom: -7, center: [0, 0] });
+            map.on('click', (event) => console.log(`[${event.latlng.lng},${event.latlng.lat}],`, event));
+
+           //L.imageOverlay('/map/4096-4096-max.jpg', bounds).addTo(map);
+
+            map.fitBounds(bounds);
+
+            for (let i = 1; i <= 30; i++) {
+                addRegionCircle(i);
+            }
+
+            for (let i = 0; i < 93; i++) {
+                addRegionRadial(i);
+            }
+
+            var regionData = L.geoJSON(null, {
+                style: {
+                    color: '#ad742e',
+                    opacity: 0.5
+                }
+            }).addTo(map);
+
+            window.regions = [];
+
+            let availableRegions = [
+            'acheron',
+            'achilles-altar',
+            'arcadian-stream',
+            'aquilas-halo',
+            'drymans-point',
+            'elysian-shore',
+            'empyrean-straits',
+            'errant-marches',
+            'formidine-rift',
+            'formorian-frontier',
+            'galactic-centre',
+            'hawkings-gap',
+            'hieronymous-delta',
+            'inner-orion-perseus-conflux',
+            'inner-orion-spur',
+            'inner-scutum-centaurus-arm',
+            'izanami',
+            'keplers-crest',
+            'mare-somnia',
+            'newtons-vault',
+            'norma-arm',
+            'norma-expanse',
+            'lyras-song',
+            'odins-hold',
+            'orion-cygnus-arm',
+            'outer-arm',
+            'outer-orion-perseus-conflux',
+            'outer-orion-spur',
+            'outer-scutum-centaurus-arm',
+            'perseus-arm',
+            'rykers-hope',
+            'sagittarius-carina-arm',
+            'sanguineous-rim',
+            'tenebrae',
+            'temple',
+            'the-abyss',
+            'the-conduit',
+            'the-veils',
+            'the-void',
+            'trojan-belt',
+            'vulcan-gate',
+            'xibalba',
+
+            /* Not done */
+            
+            
+            ];
+
+            async function loadScriptAndAddRegion(file) {
+                await fetch(`/map/${file}.json`).then(d => d.json()).then(d => {
+                    regions.push(addGalaxyRegion(d.name, null, d.coordinates));
+                })
+            }
+
+            for (let region of availableRegions) {
+                await loadScriptAndAddRegion(region);
+            }
+
+            regionData.addData(regions);
+            createGalmapMarker("Sol", 0, 0);
+            map.setView(galacticRegionCenterPosition, -7);
+        }
+
+        createMap();
+    </script>
+</body>
+
+</html>
